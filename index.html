@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#2a1245">
+<title>Panda Heist: Sweet Escape</title>
+<meta name="description" content="A cooperative stealth heist adventure starring a crew of candy-loving pandas.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐼</text></svg>">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div id="app">
+
+  <!-- ===================== TITLE SCREEN ===================== -->
+  <section id="screen-title" class="screen active">
+    <canvas id="bg-canvas"></canvas>
+    <div class="vignette"></div>
+
+    <div class="title-wrap">
+      <div class="badge-row">
+        <span class="chip">🍬 CO-OP STEALTH HEIST 🍭</span>
+      </div>
+      <h1 class="game-title">
+        <span class="title-line1">PANDA HEIST</span>
+        <span class="title-line2">Sweet <span class="escape-word">Escape</span></span>
+      </h1>
+      <p class="tagline">Sneak in. Scoop the sweets. Sneak out before sunrise.</p>
+
+      <div class="menu-buttons">
+        <button id="btn-play" class="btn btn-primary">
+          <span class="btn-icon">▶</span> Start Heist
+        </button>
+        <button id="btn-continue" class="btn btn-secondary" hidden>
+          <span class="btn-icon">⏱</span> Continue
+        </button>
+        <button id="btn-howto" class="btn btn-secondary">
+          <span class="btn-icon">❓</span> How To Play
+        </button>
+        <button id="btn-costumes" class="btn btn-secondary">
+          <span class="btn-icon">🎽</span> Crew &amp; Costumes
+        </button>
+      </div>
+
+      <div class="title-footer">
+        <button id="btn-mute" class="icon-btn" aria-label="Toggle sound">🔊</button>
+        <span class="version">v1.0 &middot; Candyland</span>
+      </div>
+    </div>
+
+    <div class="floating-candy" aria-hidden="true"></div>
+  </section>
+
+  <!-- ===================== HOW TO PLAY ===================== -->
+  <section id="screen-howto" class="screen overlay-screen">
+    <div class="panel">
+      <h2>How To Sneak &amp; Steal</h2>
+      <div class="howto-grid">
+        <div class="howto-card">
+          <div class="howto-icon">🕹️</div>
+          <h3>Move</h3>
+          <p>WASD / Arrow keys, or drag the on-screen joystick on mobile.</p>
+        </div>
+        <div class="howto-card">
+          <div class="howto-icon">👁️</div>
+          <h3>Stealth</h3>
+          <p>Stay out of guard vision cones. Bushes &amp; crates hide you. Lamps light you up!</p>
+        </div>
+        <div class="howto-card">
+          <div class="howto-icon">✨</div>
+          <h3>Abilities</h3>
+          <p>Tap the special button to use your panda's unique heist skill.</p>
+        </div>
+        <div class="howto-card">
+          <div class="howto-icon">🔐</div>
+          <h3>Vaults</h3>
+          <p>Hold action near a candy safe and stop the needle in the green zone to crack it.</p>
+        </div>
+        <div class="howto-card">
+          <div class="howto-icon">🍭</div>
+          <h3>Loot</h3>
+          <p>Grab candy for score &amp; currency. Reach the getaway van to bank your haul.</p>
+        </div>
+        <div class="howto-card">
+          <div class="howto-icon">🌅</div>
+          <h3>Sunrise</h3>
+          <p>Beat the clock! Three strikes or sunrise ends the heist.</p>
+        </div>
+      </div>
+      <button class="btn btn-primary btn-close-overlay">Got It</button>
+    </div>
+  </section>
+
+  <!-- ===================== CREW / COSTUMES ===================== -->
+  <section id="screen-crew" class="screen overlay-screen">
+    <div class="panel panel-wide">
+      <h2>Crew &amp; Costumes</h2>
+      <div id="crew-tabs" class="crew-tabs"></div>
+      <div id="crew-detail" class="crew-detail"></div>
+      <div id="costume-grid" class="costume-grid"></div>
+      <div class="crew-footer">
+        <div class="currency-tag">🍬 <span id="crew-currency">0</span></div>
+        <button class="btn btn-primary btn-close-overlay">Back</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== LEVEL SELECT ===================== -->
+  <section id="screen-levels" class="screen">
+    <canvas class="bg-canvas-static"></canvas>
+    <div class="levels-wrap">
+      <h2>Choose Your Score</h2>
+      <p class="tagline small">Pick a target, pick your panda, and start sneaking.</p>
+      <div id="level-grid" class="level-grid"></div>
+      <button id="btn-back-title" class="btn btn-secondary">← Back</button>
+    </div>
+  </section>
+
+  <!-- ===================== CHARACTER SELECT (per level) ===================== -->
+  <section id="screen-select" class="screen overlay-screen">
+    <div class="panel panel-wide">
+      <h2>Pick Your Panda</h2>
+      <div id="char-select-grid" class="char-select-grid"></div>
+      <div class="crew-footer">
+        <button id="btn-back-levels" class="btn btn-secondary">← Levels</button>
+        <button id="btn-launch" class="btn btn-primary">Begin Heist ▶</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== GAMEPLAY ===================== -->
+  <section id="screen-game" class="screen">
+    <div id="game-stage">
+      <canvas id="game-canvas"></canvas>
+
+      <div id="hud">
+        <div class="hud-top">
+          <button id="btn-pause" class="icon-btn hud-btn">⏸</button>
+          <div class="hud-center">
+            <div class="hud-timer"><span id="hud-timer-val">3:00</span> <span class="hud-timer-label">to sunrise</span></div>
+            <div class="hud-candy">🍬 <span id="hud-candy-val">0</span>/<span id="hud-candy-total">0</span></div>
+          </div>
+          <div class="hud-strikes" id="hud-strikes"></div>
+        </div>
+        <div id="alert-banner" class="alert-banner">SPOTTED!</div>
+      </div>
+
+      <div id="touch-controls">
+        <div id="joystick-zone" class="joystick-zone">
+          <div id="joystick-base" class="joystick-base">
+            <div id="joystick-nub" class="joystick-nub"></div>
+          </div>
+        </div>
+        <div class="action-buttons">
+          <button id="btn-action" class="round-btn action-btn">✋</button>
+          <button id="btn-special" class="round-btn special-btn">✨</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== PAUSE ===================== -->
+  <section id="screen-pause" class="screen overlay-screen">
+    <div class="panel">
+      <h2>Paused</h2>
+      <div class="menu-buttons">
+        <button id="btn-resume" class="btn btn-primary">▶ Resume</button>
+        <button id="btn-restart-level" class="btn btn-secondary">↺ Restart Level</button>
+        <button id="btn-quit-level" class="btn btn-secondary">■ Quit to Levels</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== RESULTS ===================== -->
+  <section id="screen-results" class="screen overlay-screen">
+    <div class="panel">
+      <h2 id="results-title">Heist Complete!</h2>
+      <div class="results-stars" id="results-stars"></div>
+      <div class="results-stats" id="results-stats"></div>
+      <div class="menu-buttons">
+        <button id="btn-retry" class="btn btn-secondary">↺ Retry</button>
+        <button id="btn-next-level" class="btn btn-primary">Next Job ▶</button>
+        <button id="btn-results-levels" class="btn btn-secondary">Levels</button>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<script src="js/audio.js"></script>
+<script src="js/costumes.js"></script>
+<script src="js/levels.js"></script>
+<script src="js/save.js"></script>
+<script src="js/input.js"></script>
+<script src="js/render.js"></script>
+<script src="js/entities.js"></script>
+<script src="js/game.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>
